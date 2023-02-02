@@ -20,18 +20,20 @@ def SchemaValidate(jsonData, schema):
     errors = []
 
     for error in validation_errors:
-        print("error.schema_path={}".format(error.schema_path))
+        # print("error.schema_path={}".format(error.schema_path))
         # print("error.schema={}".format(error.schema))
         error_type = error.schema_path[-1]
 
+        print("error_type={}, error.schema_path={}".format(error_type, error.schema_path))
+
         if error_type == "type":
-            field_name = error.schema_path[-2]
+
             field_type = error.schema['type']
 
             message = ".".join(map(str, error.path))+" is not of type {}".format(field_type)
         elif error_type == "required":
-            print("error.schema={}".format(error.schema))
-            print("error.path={}".format(error.path))
+            # print("error.schema={}".format(error.schema))
+            # print("error.path={}".format(error.path))
 
             if len(error.path) != 0:
                 message = ".".join(map(str, error.path)) +"."+((error.message).replace("'",""))
