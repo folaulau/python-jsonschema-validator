@@ -3,6 +3,7 @@
 # Press ⌃R to execute it or replace it with your code.
 # Press Double ⇧ to search everywhere for classes, files, tool windows, actions, and settings.
 
+from schema_validator_v2 import SchemaValidateV2
 from schema_validator import SchemaValidate
 from json_validators import save_schema,update_schema
 
@@ -56,7 +57,9 @@ class JsonSchemaValidation(object):
             }
         }
 
-        resp = SchemaValidate(save_json, save_schema)
+        resp = SchemaValidateV2(save_json, save_schema)
+
+        #resp = SchemaValidate(save_json, save_schema)
 
         print("resp:{}".format(resp))
 
