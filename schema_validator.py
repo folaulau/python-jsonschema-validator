@@ -6,11 +6,9 @@
 
 # Python Imports
 from jsonschema import Draft7Validator
-from jsonschema._format import FormatChecker
-from jsonschema.exceptions import ValidationError
 
 def SchemaValidate(jsonData, schema):
-    v = Draft7Validator(schema, format_checker=FormatChecker())
+    v = Draft7Validator(schema)
 
     validation_errors = [e for e in v.iter_errors(jsonData)]
 
@@ -24,21 +22,22 @@ def SchemaValidate(jsonData, schema):
         # print("error.schema={}".format(error.schema))
         error_type = error.schema_path[-1]
 
-        print("error_type={}, error.schema_path={}".format(error_type, error.schema_path))
+        print("error.path={}, error.path.type={}, error_type={}, error.schema_path={}".format(error.path, type(error.path), error_type, error.schema_path))
 
-        if error_type == "type":
+        if error_type == "type" or error_type == "enum":
 
-            field_type = error.schema['type']
+            message = ".".join(map(str, error.path)) + " value of {}".format(error.message)
 
-            message = ".".join(map(str, error.path))+" is not of type {}".format(field_type)
         elif error_type == "required":
             # print("error.schema={}".format(error.schema))
             # print("error.path={}".format(error.path))
 
+            # remove single quotes on field name
+            message = ((error.message).replace("'", ""))
+
             if len(error.path) != 0:
-                message = ".".join(map(str, error.path)) +"."+((error.message).replace("'",""))
-            else:
-                message = ((error.message).replace("'",""))
+                message = ".".join(map(str, error.path)) +"."+message
+
         else:
 
             message = error.schema["error_message"] if 'error_message' in error.schema else error.message

@@ -4,9 +4,29 @@
 # without a valid written license from Anvilogic Inc. is PROHIBITED
 #######
 
-save_schema = {
+save_evidence_schema = {
     "type": "object",
     "properties": {
+        "type": { "type": "string" },
+        "id": {
+            "type": "number",
+            "error_message": "origin.id is invalid. It must be an integer."
+        },
+        "criticality": {
+            "type": "string",
+            "enum": ["Critical", "Corresponding"]
+        }
+    },
+    "required": ["id","criticality"]
+}
+
+save_schema = {
+    "type": "object",
+    "additionalProperties": False,
+    "properties": {
+        "insert_id": {
+            "type": "integer"
+        },
         "title": {
             "type": "string",
             "minimum": 1,
@@ -64,53 +84,39 @@ save_schema = {
         },
         "evidence": {
             "type": "array",
-            "items": {
-                "type": "object"
-            }
+            "items": save_evidence_schema
         }
     },
-    "required": ["title", "status", "hypothesis","origin"]
+    "required": ["title", "status", "hypothesis","origin","queries"],
+    "if": {
+        "properties": { "insert_id": { "pattern": "^\d+$" } }
+    },
+    "then": {
+        "properties": { "hypothesis": { "pattern": ".*" } }
+    }
 }
 
-save_json = {
-    "title": "",
-    "status": "test-status",
-    "resolution": "Everything is OK. We should tune rule XYZ to reduce false-positives...",
-    "origin": {"type": "ATD Insight", "id": 233},
-    "hypothesis": "Since the dawn of time, man has sought to exploit vulnerabilities",
-    "entities": [{"name": "test"}],
-    "queries": [
-        {
-            "execution_date": "2023-01-21 18:28:35",
-            "start_date": "2023-01-21 18:28:35",
-            "end_date": "2023-01-21 18:28:35",
-            "include": [{"name": "test"}, {"name": "test2"}],
-            "exclude": [{"name": "test"}, {"name": "test2"}],
-            "total_events": 23,
-            "show_in_history": False,
-            "entities": {
-                "host": 23,
-                "user": 123
-            }
+update_schema = {
+    "type": "object",
+    "properties": {
+        "insert_id": {
+            "type": "integer"
+        },
+        "hypothesis": {
+            "type": "string",
+            "minLength": 1,
+            "error_message": "hypothesis is invalid"
+        },
+        "resolution": {
+            "type": "string",
+            "minLength": 1,
+            "error_message": "resolution is invalid"
         }
-    ],
-    "evidence": [
-        {
-            "event_id": "16696548011669654800000002016139259668",
-            "summary": "Malicious process example.exe downloaded a file on host my-computer",
-            "fields": ["process_name", "host", "file_hash"],
-            "iocs": [{"name": "IP", "value": "8.8.8.8"}],
-            "show_in_timeline": True,
-            "criticality": "CRITICAL",
-            "notes": "test note"
-        }
-    ],
-    "relationships": {
-        "source_type": "event",
-        "source_id": "string",
-        "target_type": "entity",
-        "target_id": "GUID",
-        "title": "string",
-        "note": "string"
+    },
+    "if": {
+        "properties": { "insert_id": { "pattern": "^\d+$" } }
+    },
+    "then": {
+        "properties": { "hypothesis": { "pattern": ".*" } }
     }
 }
